@@ -1,0 +1,55 @@
+!obj:pylearn2.train.Train {
+
+    dataset: &train !obj:pylearn2.datasets.timit.timit.TIMIT {
+        classes_number: 20,
+        which_set : 'train'
+    },
+    model: !obj:pylearn2.models.mlp.MLP {
+        layers: [
+                 !obj:pylearn2.models.mlp.RectifiedLinear {
+                     layer_name: 'h0',
+                     dim: 500,
+                     sparse_init: 7,
+                 },!obj:pylearn2.models.mlp.RectifiedLinear {
+                     layer_name: 'h1',
+                     dim: 500,
+                     sparse_init: 7,
+                 },!obj:pylearn2.models.mlp.RectifiedLinear {
+                     layer_name: 'h2',
+                     dim: 500,
+                     sparse_init: 7,
+                 },!obj:pylearn2.models.mlp.Softmax {
+                     layer_name: 'y',
+                     n_classes: 20,
+                     irange: 0.01
+                 }
+                ],
+        nvis: 273,
+    },
+    algorithm: !obj:pylearn2.training_algorithms.sgd.SGD {
+        batch_size: 100,
+        learning_rate: .00001,
+        monitoring_dataset:
+            {
+                'train' : *train,
+                'valid'  : !obj:pylearn2.datasets.timit.timit.TIMIT {
+                              which_set : 'valid',
+                              classes_number: 20
+                          },
+            },
+        learning_rule: !obj:pylearn2.training_algorithms.learning_rule.Momentum {
+            init_momentum: .5
+        },
+        termination_criterion: !obj:pylearn2.termination_criteria.And {
+            criteria: [
+                !obj:pylearn2.termination_criteria.EpochCounter {
+                    max_epochs: 1000
+                }
+            ]
+        }
+    },
+    save_path: "/home/gortolan/MachineLearning/timit_model.pkl",
+    save_freq: 1
+}
+
+
