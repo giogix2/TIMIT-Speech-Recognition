@@ -1,0 +1,30 @@
+__author__ = 'giova'
+
+import scipy.io
+from sklearn import preprocessing
+import os.path, sys
+import numpy as np
+from pylearn2.utils import serial
+from pylearn2.format.target_format import convert_to_one_hot
+from pylearn2.datasets import cache, dense_design_matrix
+import pickle
+from pylearn2.space import VectorSpace
+
+class TIMIT(dense_design_matrix.DenseDesignMatrix):
+
+
+    def __init__(self, classes_number, which_set):
+        self.classes_number = classes_number
+        self.path = '/home/gortolan/MachineLearning/'
+        self.which_set = which_set
+        denseMatrix = pickle.load(open(self.path+self.which_set+'_cons_small.pkl', "rb" ))
+        self.x = denseMatrix.X
+        self.y = denseMatrix.y
+        X_space = VectorSpace(dim=273)
+        X_source = 'features'
+        Y_space = VectorSpace(dim=32)
+        Y_source = 'targets'
+        space = VectorSpace(X_space, Y_space)
+        source = VectorSpace(X_source, Y_source)
+        self.data_specs = (space, source)
+        super(TIMIT, self).__init__(X=self.x, y=self.y, y_labels=32)
